@@ -4,28 +4,65 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
 
-  const [number, setNumber] = useState(1);
+  const [state, setState] = useState({
+    minValue: "",
+    maxValue: "",
+    currentStep: 1,
+    streak: 0,
+    previousValue: "",
+    currentValue: undefined
+  });
 
-    const getRandomNumber = () => {
-        const randomNumber = Math.floor(Math.random() * 20) + 1;
-        setNumber(randomNumber);
+  const getRandomNumber = (value:number, title:any) => {
+    const randomNumber:any = Math.floor(Math.random() * 20) + 1;
+    const { currentValue } = state; 
+  
+    if (currentValue === undefined) {
+      setState({ ...state, currentValue: randomNumber });
+    } else {
+      let streak = state.streak;
+      
+      if ((title === "higher" && randomNumber > value) || (title === "lower" && randomNumber < value)) {
+        streak += 1
+      } else {
+        streak = 0
+      }
+  
+      setState({
+        ...state,
+        streak: streak,
+        previousValue: currentValue,
+        currentValue: randomNumber,
+      });
+    }
+  };
+  
+  
+
+    function nextGuess(title:any) {
+      // console.log(title)
+
+      // setState({...state, buttonPressed: title})
+      getRandomNumber(state.currentValue, title)
     }
 
     useEffect(() => {
-        getRandomNumber();
+        getRandomNumber(state.currentValue, "");
     }, []);
 
   return (
     <View style={styles.container}>
       <Text>Will the next number be higher or lower?</Text>
       <Text>(1-20)</Text>
-      <Text style={styles.number}>{number}</Text>
+      <Text style={styles.number}>streak - {state.streak}</Text>
+      <Text style={styles.number}>current - {state.currentValue}</Text>
+      <Text style={styles.number}>previous - {state.previousValue}</Text>
       <View style={{ flexDirection:"row" }}>
         <View style={styles.buttonStyle}>
-          <Button title="lower" onPress={() => getRandomNumber()} />
+          <Button title="lower" onPress={() => nextGuess("lower")} />
         </View>
         <View style={styles.buttonStyle}>
-        <Button title="higher" onPress={() => getRandomNumber()} />
+        <Button title="higher" onPress={() => nextGuess("higher")} />
         </View>
       </View>      
       
